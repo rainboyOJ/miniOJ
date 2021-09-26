@@ -14,6 +14,10 @@
 
 #include <unistd.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <iostream>
 
 #define CONTENT_LENGTH "Content-Length"
 
@@ -241,6 +245,8 @@ public:
   }
 
   inline void start(){
+      get_client_ip();
+      std::cout << "client_ip: "<< client_ip <<std::endl;
       handle_read();
   };
 
@@ -305,6 +311,7 @@ private:
 
       return true;
   }
+  void get_client_ip();
 
   request_handler& request_handler_; /// The handler used to process the incoming request.
   std::array<char, 8192> buffer_; /// Buffer for incoming data.
@@ -312,6 +319,7 @@ private:
   request_parser request_parser_{}; /// The parser for the incoming request.
   reply reply_; /// The reply to be sent back to the client.
   int client_socket{-1}; /// raw socket
+  char client_ip[INET_ADDRSTRLEN];//保存点分十进制的地址
 
 };
 

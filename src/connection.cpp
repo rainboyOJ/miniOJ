@@ -623,4 +623,14 @@ namespace http {
                 return bad;
         }
     }
-}
+
+
+    /// ========================== connection
+    void connection::get_client_ip(){
+        struct sockaddr_in peerAddr;
+        socklen_t peerLen;
+        getpeername(client_socket, (struct sockaddr *)&peerAddr, &peerLen); //获取connfd表示的连接上的对端地址
+        inet_ntop(AF_INET, &peerAddr.sin_addr, client_ip, sizeof(client_ip));
+        //ntohs(peerAddr.sin_port));
+    }
+} // namespace http end
