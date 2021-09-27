@@ -61,6 +61,11 @@ struct reply
         headers[1].value = "text/html";
   }
 
+  void set_content_json(std::string_view _content){
+      set_content(_content);
+      headers[1].value= "application/json";
+  }
+
 };
 } //end namespace http
 

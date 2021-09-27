@@ -61,6 +61,7 @@ private:
           if (result == request_parser::good)
           {
               request_handler_.handle_request(request_, reply_); //根据请求 得到replay
+              request_.remote_ip = this->client_ip;
               router(request_,reply_);
               //得到ip
               //request_.remote_ip = this->socket().remote_endpoint().address().to_string();

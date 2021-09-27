@@ -78,7 +78,7 @@ namespace judge {
                 / (std::string("main") + std::get<1>(string_to_lang(lang)));
         }
 
-        const std::filesystem::path base_path;
+        std::filesystem::path base_path;
     };
 
 
@@ -100,13 +100,11 @@ namespace judge {
                         head.fetch_sub(1);
                         return -1;
                     }
-                    msg_que[pos] = {
-                        request_ip,
-                        pid,
-                        lang,
-                        status,
-                        _mcp(pos,lang)
-                    };
+                    msg_que[pos].request_ip = request_ip;
+                    msg_que[pos].pid        = pid;
+                    msg_que[pos].lang       = lang;
+                    msg_que[pos].status     = RESULT_MEAN::JUDGING;
+                    msg_que[pos].code_path  = _mcp(pos,lang) ;
                     return pos;
                 }
                 bool deque(); //不能出队
