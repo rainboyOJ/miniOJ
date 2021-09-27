@@ -70,11 +70,11 @@ public:
 
 
     template<http_method method = GET,typename Function>
-    void reg(std::string url,Function&& __f){
+    void reg(std::string_view url,Function&& __f){
         if constexpr ( method != POST && method != GET){
             throw std::invalid_argument("现在只支持 GET 与 POST");
         }
-        routers.push_back( {method_name(method), url,std::forward<Function>(__f)} );
+        routers.push_back( {method_name(method), std::string(url),std::forward<Function>(__f)} );
     }
 
     void default_router(request&,reply&);
