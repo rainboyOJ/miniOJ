@@ -20,7 +20,8 @@
 
 class HttpServer {
     public:
-        explicit HttpServer(u_short port,std::string doc_root = ".",unsigned int pool_size = 4)
+        explicit HttpServer(u_short port,std::string doc_root = ".",
+                unsigned int pool_size = std::max( std::thread::hardware_concurrency(), 1u) )
             :port{port},doc_root{doc_root},
             request_handler{doc_root},th_pool{pool_size}
         {}

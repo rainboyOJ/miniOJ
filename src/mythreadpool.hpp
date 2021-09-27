@@ -11,6 +11,7 @@
 #include <thread>
 #include <functional>
 #include <stdexcept>
+#include <algorithm>
 
 
 namespace THREAD_POOL {
@@ -45,7 +46,9 @@ public:
     threadpool(const thread &)            = delete;
     threadpool& operator=(const thread &) = delete;
 
-    explicit threadpool(unsigned int size = 4) { addThread(size);}
+    explicit threadpool(unsigned int size = 
+            std::max( std::thread::hardware_concurrency(), 1u)
+            ) { addThread(size);}
     ~threadpool(){
         //std::cout << "dcotr" << std::endl;
         _run = false;
