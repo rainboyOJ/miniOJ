@@ -54,6 +54,8 @@ private:
 
 struct Check {
 
+    // 返回 true 表示一样
+    // false 表示不一样
     static bool noipstyle_check(
             const std::string_view user_output_path,
             const std::string_view std_output_path )

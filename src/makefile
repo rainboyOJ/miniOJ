@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS= -std=c++17
+CXXFLAGS=-g -std=c++17
 
 SRC=$(wildcard *.cpp)
 HPP_FILES=$(wildcard *.hpp)

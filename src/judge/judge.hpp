@@ -11,8 +11,12 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include "check.hpp"
+#include "../utils.hpp"
 
 namespace  judge {
+
+std::string readFile(std::string_view path);
 
 #define __print_result(node,RESULT) std::cout << std::setw(12) << #node ": " << RESULT.node <<'\n';
 #define print_result(RESULT)\
@@ -50,11 +54,11 @@ namespace  judge {
         DUP2_FAILED         = -8,
         SETUID_FAILED       = -9,
         EXECVE_FAILED       = -10,
-        SPJ_ERROR           = -11
+        SPJ_ERROR           = -11,
+        COMPILE_FAIL        = -12 // TODO
     };
 
     enum RESULT_MEAN {
-        JUDGING                  = -2,
         WRONG_ANSWER             = -1,
         CPU_TIME_LIMIT_EXCEEDED  = 1,
         REAL_TIME_LIMIT_EXCEEDED = 2,
@@ -63,11 +67,20 @@ namespace  judge {
         SYSTEM_ERROR             = 5
     };
 
+    enum class STATUS : int {
+        WAITING,
+        PROBLEM_ERROR,
+        PROBLEM_DATA_NOT_EXISTS,
+        JUDGING,
+        COMPILE_ERROR,
+        END
+    };
+    std::string_view STATUS_to_string(STATUS s);
+
     std::string_view result_to_string(RESULT_MEAN mean);
 
     // 存结果 POD
-    struct result {
-        int cpu_time;
+    struct result { int cpu_time;
         int real_time;
         long memory;
         int signal;
@@ -75,6 +88,28 @@ namespace  judge {
         int error;
         int result;
     };
+
+    //更好的result
+    //struct result_detail {
+        //int cpu_time;       //ms
+        //int real_time;      //ms
+        //float memory;       //mb
+        //int signal;
+        //int exit_code;
+        //std::string error;
+        //std::string result; //
+        //result_detail& operator=(struct result& r){
+            //cpu_time = r.cpu_time;
+            //real_time = r.real_time;
+            //memory = r.memory/1024.0/ 1024.0/1024.0; //todo
+            //exit_code  = r.exit_code;
+            //signal = r.signal;
+            //error =  //error 与result 到底是什么意思
+            //return *this;
+        //}
+    //};
+
+
 
     void exec(const char* cmd,std::ostream& __out);
 
@@ -165,11 +200,11 @@ namespace  judge {
 
     struct Problem {
         Problem()=delete;
-        explicit Problem(const std::string& path,const std::string& pid)
-            : parent_path(path),pid(pid)
+        explicit Problem(const std::string_view path,const std::string_view pid)
         {
             //检查路径是否存在
             auto p_path = fs::path(path) / pid;
+            //log("p_path",p_path);
             if(not fs::exists(p_path) )
                 throw std::runtime_error(p_path.string() + " 不存在!");
 
@@ -193,25 +228,7 @@ namespace  judge {
 
             sort(input_data.begin(),input_data.end());
             sort(output_data.begin(),output_data.end());
-            //for (const auto& e : input_data) {
-            //std::cout << e.first << " " << e.second << std::endl;
-            //}
-
-            //std::cout << "--" << std::endl;
-            //for (const auto& e : output_data) {
-            //std::cout << e.first << " " << e.second << std::endl;
-            //}
         };
-        std::string pid;
-        fs::path parent_path;
-
-        //struct data {
-        //int id;
-        //std::string name;
-        //std::string full_path() const{
-        //return 
-        //}
-        //};
 
         std::vector<std::pair<int,std::string>> input_data; //数据
         std::vector<std::pair<int,std::string>> output_data; //数据
@@ -220,30 +237,35 @@ namespace  judge {
     };
 
     struct Judger{
-        Judger
+        explicit Judger
         (
          std::string_view code_full_path, //代码的路径
          SUPORT_LANG lang,      //语言
-         std::string_view pid       //problem id
+         std::string_view pid,       //problem id
+         std::string_view problem_base
         ):work_path{ fs::path(code_full_path).parent_path() },
             code_name{fs::path(code_full_path).filename()},
             lang{lang},
-            pid{pid}
+            pid{pid},
+            problem_base{problem_base}
             {
                 //创建对应的文件夹
-                if( !  fs::create_directories(work_path) ){
+                //if( !  fs::create_directories(work_path) ){
                     //throw std::runtime_error(std::string("创建对应的文件夹 失败") + work_path.string());
-                }
+                //}
                 //定入代码
                 //std::ofstream __code(code_path.c_str());
                 //__code << code;
                 //__code.close();
             }
 
-        void run();       //开始评测
-        bool compile();
+        
+        std::tuple<STATUS,std::string,std::vector<result>> 
+            run();       //开始评测
+        bool compile(judge_args & args);
         const SUPORT_LANG lang; // 评测的语言
         const std::string pid;  // pid
+        std::string_view problem_base;
 
         //哪里的位置，开始评测
         fs::path    work_path;
