@@ -13,7 +13,7 @@ void HttpServer::go() {
             throw std::runtime_error("accept failed, LINE: " + std::to_string(__LINE__));
 
         {
-            auto conn = std::make_shared<http::connection>(client_sock,request_handler,router);
+            auto conn = std::make_shared<http::connection<routerType> >(client_sock,request_handler,router);
             th_pool.commit([conn](){ conn->start(); });
         }
     }

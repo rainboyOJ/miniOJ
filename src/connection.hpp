@@ -24,13 +24,14 @@
 namespace http {
 
 
-class connection : public std::enable_shared_from_this<connection>
+template<typename routerType>
+class connection : public std::enable_shared_from_this<connection<routerType> >
 {
 public:
     using connection_ptr = std::shared_ptr<connection>;
     using socket_type    = int;
 public:
-  explicit connection(socket_type socket, request_handler& handler,miniRouter& router)
+  explicit connection(socket_type socket, request_handler& handler,routerType& router)
     :client_socket{socket},request_handler_{handler},
       router{router}
   {}
@@ -62,7 +63,8 @@ private:
           {
               request_handler_.handle_request(request_, reply_); //根据请求 得到replay
               request_.remote_ip = this->client_ip;
-              router(request_,reply_);
+              if(!reply_.status)
+                  router(request_,reply_);
               //得到ip
               //request_.remote_ip = this->socket().remote_endpoint().address().to_string();
               //log("request_.remote_ip ",request_.remote_ip );
@@ -121,7 +123,6 @@ private:
 
 
   request_handler& request_handler_; /// The handler used to process the incoming request.
-  miniRouter& router;
   std::array<char, 8192> buffer_; /// Buffer for incoming data.
   request request_; /// The incoming request.
   request_parser request_parser_{}; /// The parser for the incoming request.
@@ -129,7 +130,7 @@ private:
   int client_socket{-1}; /// raw socket
   char client_ip[INET_ADDRSTRLEN];//保存点分十进制的地址
 
-
+  const routerType& router;
 };
 
 } //end namespace http

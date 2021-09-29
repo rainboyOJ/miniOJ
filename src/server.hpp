@@ -23,17 +23,24 @@ class HttpServer {
         explicit HttpServer(u_short port,std::string doc_root = ".",
                 unsigned int pool_size = std::max( std::thread::hardware_concurrency(), 1u) )
             :port{port},doc_root{doc_root},
-            request_handler{doc_root},th_pool{pool_size}
+            th_pool{pool_size},
+            router{*this}
         {}
 
         HttpServer(const HttpServer & ) = delete;
         HttpServer& operator=(const HttpServer & ) =delete;
+        
         ~HttpServer(){
             std::cout << "Bye bye." << std::endl;
             close(server_sock);
         }
 
+        using routerType = http::miniRouter<HttpServer>;
+        //typedef http::miniRouter<HttpServer> routerType;
+
         void go();
+    public:
+        std::string doc_root;
     private:
         int startup(u_short * pport); //对server建立一个监听的socket
 
@@ -44,7 +51,6 @@ class HttpServer {
         struct    sockaddr_in client_name;
         socklen_t client_name_len{sizeof(client_name)};
 
-        std::string doc_root;
 
         // 创建一个request_handle
         http::request_handler request_handler;
@@ -53,7 +59,7 @@ class HttpServer {
         THREAD_POOL::threadpool th_pool{4};
 
     public:
-        http::miniRouter      router;
+        routerType router;
 
 };
 

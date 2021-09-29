@@ -8,6 +8,7 @@
 
 #include "http/request.hpp"
 #include "http/reply.hpp"
+#include "utils.hpp"
 
 namespace http {
 
@@ -65,8 +66,13 @@ namespace http {
 		}
 	}
 
+template<typename HttpServerType>
 class miniRouter {
 public:
+    explicit miniRouter(HttpServerType& server)
+        :server{server}
+    {}
+
 public:
     using routerType = std::function<void(request&,reply&)>;
     using uriType    = std::variant<std::string,std::regex>;
@@ -80,8 +86,45 @@ public:
         routers.push_back( {method_name(method), std::move(uri),std::forward<Function>(__f)} );
     }
 
-    void default_router(request&,reply&);
-    void operator()(request&,reply&);   //对传进来的req进行路由
+    void default_router(request& req,reply& rep) const{
+        //TODO 查找相应的文件
+        //1.判断是否有后缀
+
+        std::size_t last_slash_pos = req.uri.find_last_of("/");
+        std::size_t last_dot_pos = req.uri.find_last_of(".");
+        std::string extension;
+
+        if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+        {
+            extension = req.uri.substr(last_dot_pos + 1);
+        }
+        log_one(server.doc_root);
+
+        rep = reply::stock_reply(reply::status_type::not_found);
+    }
+
+    
+    void operator()(request& req,reply& rep) const{
+        for (const auto& e : routers) {
+            if( e.method == req.method ){
+                if( std::holds_alternative<std::string>(e.uri) ){
+                    if(std::get<std::string>(e.uri) == req.uri) {
+                        e.route(req,rep);
+                        return;
+                    }
+                }
+                else { //regx
+                    auto reg = std::get<std::regex>(e.uri);
+                    if( std::regex_match(req.uri,req.sm,reg) ) //匹配成功
+                    {
+                        e.route(req,rep);
+                        return;
+                    }
+                }
+            }
+        }
+        default_router(req, rep);
+    }   
     
     struct node {
         const std::string_view method;
@@ -92,6 +135,7 @@ public:
 
 private:
     std::vector<node> routers;
+    const HttpServerType& server; //拥有这个router的服务的引用
 
 };
 
