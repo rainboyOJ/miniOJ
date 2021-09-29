@@ -15,7 +15,7 @@ TARGET+=$(patsubst %.cpp,%.o,$(HTTP_CPP))
 server: $(TARGET) $(HPP_FILES) $(HTTP_HPP)
 	$(CXX) $(CXXFLAGS) -o $@ $(TARGET) -lpthread
 
-%.o: %.cpp %.hpp
+%.o: %.cpp $(HTTP_HPP) $(HPP_FILES)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< -lpthread
 
 

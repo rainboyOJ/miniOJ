@@ -61,10 +61,13 @@ private:
 
           if (result == request_parser::good)
           {
+              log_one(request_.uri);
               request_handler_.handle_request(request_, reply_); //根据请求 得到replay
               request_.remote_ip = this->client_ip;
-              if(!reply_.status)
+              if(reply_.status == reply::status_type::unset){
+                  log("go in router");
                   router(request_,reply_);
+              }
               //得到ip
               //request_.remote_ip = this->socket().remote_endpoint().address().to_string();
               //log("request_.remote_ip ",request_.remote_ip );

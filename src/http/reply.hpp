@@ -2,8 +2,11 @@
 #include <string>
 #include <vector>
 #include <type_traits>
+#include <filesystem>
+#include <fstream>
 
 #include "header.hpp"
+#include "mime_types.hpp"
 
 namespace http {
 
@@ -14,6 +17,7 @@ struct reply
   /// The status of the reply.
   enum status_type
   {
+    unset                    = 0,
     ok                    = 200,
     created               = 201,
     accepted              = 202,
@@ -30,7 +34,7 @@ struct reply
     not_implemented       = 501,
     bad_gateway           = 502,
     service_unavailable   = 503
-  } status;
+  } status{unset};
 
   /// The headers to be included in the reply.
   std::vector<header> headers;
@@ -64,6 +68,20 @@ struct reply
   void set_content_json(std::string_view _content){
       set_content(_content);
       headers[1].value= "application/json";
+  }
+
+  void set_content_by_path(const std::filesystem::path& path){
+        status = reply::ok;
+        char buf[512];
+
+        std::ifstream is(path.c_str(), std::ios::in | std::ios::binary);
+        while (is.read(buf, sizeof(buf)).gcount() > 0)
+            content.append(buf, is.gcount());
+        headers.resize(2);
+        headers[0].name = "Content-Length";
+        headers[0].value = std::to_string(content.size());
+        headers[1].name = "Content-Type";
+        headers[1].value = mime_types::extension_to_type(path.extension().c_str());
   }
 
 };

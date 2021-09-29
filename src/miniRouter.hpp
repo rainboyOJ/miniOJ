@@ -89,18 +89,17 @@ public:
     void default_router(request& req,reply& rep) const{
         //TODO 查找相应的文件
         //1.判断是否有后缀
+        std::string_view uri_view = req.uri;
+        if( uri_view[0] == '/') uri_view.remove_prefix(1); // remove slash
 
-        std::size_t last_slash_pos = req.uri.find_last_of("/");
-        std::size_t last_dot_pos = req.uri.find_last_of(".");
-        std::string extension;
+        fs::path file_path = fs::path(server.doc_root) / uri_view;
+        if(!file_path.has_extension())
+            file_path  = file_path.string() + ".html";
 
-        if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
-        {
-            extension = req.uri.substr(last_dot_pos + 1);
-        }
-        log_one(server.doc_root);
-
-        rep = reply::stock_reply(reply::status_type::not_found);
+        if( fs::exists(file_path))
+            rep.set_content_by_path(file_path);
+        else
+            rep = reply::stock_reply(reply::status_type::not_found);
     }
 
     

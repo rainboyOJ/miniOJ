@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 
 namespace http {
 
@@ -14,8 +15,10 @@ namespace http {
             { 0, 0 } // Marks end of list.
         };
 
-        static std::string extension_to_type(const std::string& extension)
+        static std::string extension_to_type(std::string_view extension)
         {
+            if( extension[0] == '.') extension.remove_prefix(1);
+
             for (const mapping* m = mappings; m->extension; ++m)
             {
                 if (m->extension == extension)
