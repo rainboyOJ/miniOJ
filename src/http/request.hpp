@@ -4,6 +4,7 @@
 #include <tuple>
 #include <sstream>
 #include <fstream>
+#include <regex>
 
 #include "header.hpp"
 #include "reply.hpp"
@@ -16,6 +17,7 @@ struct request
   std::string method;
   std::string uri;
   std::string remote_ip;
+  std::smatch sm; // 如果uri被reg匹配 会返回匹配的结果
 
   int http_version_major;
   int http_version_minor;

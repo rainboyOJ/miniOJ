@@ -17,6 +17,12 @@ int main(int argc,char * argv[]){
     //一个不停取出数据 进行评测的线程
 
     HttpServer http(8080);
+    http.router.reg<http::GET>(std::regex("/problem/(\\d+)/result"),[](http::request& req,http::reply& rep ){
+                //for(int i=0;i<=req.sm.size()-1;++i){
+                    //std::cout << req.sm[i]  ;
+                //}
+                rep.set_content("hello problem id " + std::string(req.sm[1]));
+            });
 
     //注册路由
     http.router.reg<http::POST>("/judge",

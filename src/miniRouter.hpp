@@ -2,6 +2,8 @@
 
 #include <functional>
 #include <string_view>
+#include <variant>
+#include <regex>
 #include <type_traits>
 
 #include "http/request.hpp"
@@ -67,22 +69,24 @@ class miniRouter {
 public:
 public:
     using routerType = std::function<void(request&,reply&)>;
+    using uriType    = std::variant<std::string,std::regex>;
 
 
     template<http_method method = GET,typename Function>
-    void reg(std::string_view url,Function&& __f){
+    void reg(uriType uri,Function&& __f){
         if constexpr ( method != POST && method != GET){
             throw std::invalid_argument("现在只支持 GET 与 POST");
         }
-        routers.push_back( {method_name(method), std::string(url),std::forward<Function>(__f)} );
+        routers.push_back( {method_name(method), std::move(uri),std::forward<Function>(__f)} );
     }
 
     void default_router(request&,reply&);
-    void operator()(request&,reply&);
+    void operator()(request&,reply&);   //对传进来的req进行路由
     
     struct node {
         const std::string_view method;
-        const std::string      uri;
+        //const std::string      uri;
+        uriType uri;
         routerType  route;
     };
 
