@@ -40,7 +40,7 @@ class HttpServer {
 
         void go();
     public:
-        std::string doc_root;
+        fs::path doc_root;
     private:
         int startup(u_short * pport); //对server建立一个监听的socket
 

@@ -62,7 +62,7 @@ struct reply
         headers[0].name = "Content-Length";
         headers[0].value = std::to_string(content.size());
         headers[1].name = "Content-Type";
-        headers[1].value = "text/html";
+        headers[1].value = "text/html;charset=utf-8";
   }
 
   void set_content_json(std::string_view _content){

@@ -1,12 +1,48 @@
-<!--显示一个文章-->
+<!--显示一个文章或题目-->
 
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
-    <meta charset="UTF-8">
-    <title></title>
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="/assests/style.css">
+  <link rel="stylesheet" href="/assests/github-markdown.css">
+  <script>
+    var markdown = "_replace_markdown_";
+//var markdown="IyMgYeS4reaWh2IK";
+  </script>
 </head>
+
 <body>
-    
+  <div class="container">
+
+    <p id='title'>title</p>
+    <div id="content" class="markdown-body"></div>
+    <div class="line_01"></div>
+    <div class="codeSubmit">
+      <button onclick="submit()">提交</button>
+      <textarea id="code" name="" cols="30" rows="10"></textarea>
+    </div>
+
+  </div>
+  <script src="/assests/markdown-it.min.js"></script>
+  <script>
+    function base64Decode(input) {
+      rv = window.atob(input);
+      rv = escape(rv);
+      rv = decodeURIComponent(rv);
+      return rv;
+    }
+    var md = window.markdownit();
+    var result = md.render(base64Decode(markdown));
+    document.getElementById("content").innerHTML = result
+    //console.log(result)
+    function submit() {
+      var code = document.getElementById('code').value
+      console.log(text)
+    }
+  </script>
 </body>
+
 </html>

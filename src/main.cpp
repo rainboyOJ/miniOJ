@@ -7,16 +7,51 @@
 //judge::Make_code_path mcp("/home/rainboy/tmp/tmp"); //默认的位置
 //judge::judge_msg_queue result_q(mcp);
 
+auto problem_base = "/home/rainboy/mycode/RainboyOJ/problems/problems";
 judge::JudgeWorker<100000,100000,2> Judger{
     "/home/rainboy/mycode/RainboyOJ/problems/problems",
     "/home/rainboy/tmp/tmp"
 };
+
+Base64 base_64;
 
 int main(int argc,char * argv[]){
 
     //一个不停取出数据 进行评测的线程
 
     HttpServer http(8080,"../www"); // 端口,静态资源地址
+
+
+    //获取一个题目
+    http.router.reg<http::GET>(std::regex("/problem/(\\d+)"),[&http](http::request& req,http::reply& rep ){
+
+            auto pid  = req.sm[1].str();
+            //得到这个题目的content.md
+            auto content_path = fs::path(problem_base) / pid / "content.md";
+            log_one(content_path);
+            if( !  fs::exists(content_path) ){
+                rep = http::reply::stock_reply(http::reply::not_found);
+                return;
+            }
+            auto ss = readFile(content_path);
+            //log_one( base_64.Encode(ss.str().c_str(), ss.str().size()));
+
+            //读取article.html
+            auto article_html_path = http.doc_root  / "article.html";
+
+            auto res = std::regex_replace(
+                    readFile(article_html_path),
+                    std::regex("_replace_markdown_"),
+                    base_64.Encode(ss.c_str(), ss.size()),
+                    std::regex_constants::format_first_only);
+            log_one(res);
+
+            rep.set_content(res.c_str());
+
+            });
+
+
+
     http.router.reg<http::GET>(std::regex("/problem/(\\d+)/result"),[](http::request& req,http::reply& rep ){
                 //for(int i=0;i<=req.sm.size()-1;++i){
                     //std::cout << req.sm[i]  ;

@@ -12,6 +12,7 @@ namespace http {
             { "html", "text/html" },
             { "jpg", "image/jpeg" },
             { "png", "image/png" },
+            { "css","text/css; charset=UTF-8"},
             { 0, 0 } // Marks end of list.
         };
 

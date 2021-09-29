@@ -1,0 +1,25 @@
+.container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    /*border: 1px solid #eee;*/
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+
+}
+.line_01{
+    padding: 0 20px 0;
+    margin: 2rem 0;
+    line-height: 1px;
+    border-bottom: 3px solid #ddd;
+    text-align: center;
+}
+
+.codeSubmit {
+  display: flex;
+  flex-direction: column;
+}
+.codeSubmit button {
+    width: 12em;
+    margin: 1rem;
+}
