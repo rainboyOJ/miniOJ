@@ -52,12 +52,19 @@ int main(int argc,char * argv[]){
 
 
 
-    http.router.reg<http::GET>(std::regex("/problem/(\\d+)/result"),[](http::request& req,http::reply& rep ){
-                //for(int i=0;i<=req.sm.size()-1;++i){
-                    //std::cout << req.sm[i]  ;
-                //}
-                rep.set_content("hello problem id " + std::string(req.sm[1]));
-            });
+    //获取一个 测试的结果
+    http.router.reg<http::GET>(std::regex("/result/(\\d+)/json"),[&http](http::request& req,http::reply& rep ){
+            auto id = atoi(req.sm[1].str().c_str());
+            auto ss = Judger.judge_result_to_json(id);
+            rep.set_content_json(ss.c_str());
+        });
+
+    http.router.reg<http::GET>(std::regex("/result/(\\d+)"),[&http](http::request& req,http::reply& rep ){
+            //auto id = atoi(req.sm[1].str().c_str());
+            auto html_path = http.doc_root  / "result.html";
+            rep.set_content( readFile(html_path) );
+        });
+
 
     //注册路由
     http.router.reg<http::POST>("/judge",

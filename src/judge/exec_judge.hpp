@@ -164,7 +164,60 @@ namespace judge {
             _task_cv.notify_one();
             log("加入评测队列");
             return id;
-        } // TODO
+        } 
+        // 通过结果id 来得到结果
+        std::string judge_result_to_json(int id){
+
+            try {
+                //typename judge_msg_queue<jsq_size>::msg __res{};
+                auto& __res = jsq.get_msg(id);
+                std::stringstream json;
+                json << "{";
+                json << R"("status": ")"; 
+                json << STATUS_to_string(__res.status)<< "\","; //请求ip
+                json << R"("msg": ")";
+                json << __res.msg<< "\"";  //
+
+                if( __res.status != STATUS::END ){
+                    json << "}";
+                    return json.str();
+                }
+                json << ","; // msg的,
+
+                json << R"("request_ip": ")"; 
+                json << __res.request_ip << "\","; //请求ip
+                json << R"("pid": ")"; 
+                json << __res.pid << "\",";        //pid
+                json << R"("lang": ")"; 
+                json << __res.lang << "\",";       //代码语言 c++ python3
+                json << R"("code_path": ")";
+                json << __res.code_path << "\",";  //
+
+
+                json << R"("results":[)";
+
+                for (int i = 0; i < __res.results.size() ;i++) {
+                    auto & e = __res.results[i];
+                    json << "{";
+                    json << "\"cpu_time\":"<<   e.cpu_time<<",";
+                    json << "\"real_time\":"<<  e.real_time<<",";
+                    json << "\"memory\":"<<     e.memory<<",";
+                    json << "\"signal\":"<<     e.signal<<",";
+                    json << "\"exit_code\":"<<  e.exit_code<<",";
+                    json << "\"error\":"<<      e.error<<",";
+                    json << "\"result\":"<<     e.result;
+                    json << "}";
+                    if( i != __res.results.size()-1)
+                        json << ",";
+                }
+
+                json << "]}";
+                return json.str();
+            }
+            catch(std::exception & e){
+                //TODO
+            }
+        }
 
     private:
         void addThread(unsigned int size){

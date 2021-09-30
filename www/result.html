@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>评测结果</title>
+    <link rel="stylesheet" href="/assests/style.css">
+    <script>
+        var result = "_replace_result_";
+    </script>
+</head>
+<body>
+  <div class="container">
+      <div class="row problem-info" style="justify-content: center;">
+          <span>题目:
+              <a id="pid" href="/problem/">1000 titile</a>
+          </span>
+          <span>评测编号
+              <strong id="judge-id">0</strong>
+          </span>
+          <span>
+              <a id="code-path" href="">查看代码</a>
+          </span>
+      </div>
+      <div class="row">
+        <h3>状态：</h3>
+        <span id="status" class="one-short-S"></span>
+        <span class="Loading" id="loading"></span>
+      </div>
+      <div class="row_column" style="" id="msg-father">
+          <h3>错误信息:</h3>
+          <br>
+          <pre><code id="msg">__err_msg_</code></pre>
+      </div>
+      <div class="row">
+          <h3>简易结果：</h3>
+          <span class="short-result" id="short-result"></span>
+      </div>
+      <div class="row_column">
+          <h3>详细结果:</h3>
+          <table >
+              <thead>
+              <tr>
+                  <th>编号</th>
+                  <th>内存</th>
+                  <th>时间</th>
+                  <th>结果</th>
+              </tr>
+              </thead>
+              <tbody id="results">
+              </tbody>
+          </table>
+      </div>
+  </div>
+  <script src="/assests/app.js"></script>
+  <script>
+      set_result()
+  </script>
+</body>
+</html>

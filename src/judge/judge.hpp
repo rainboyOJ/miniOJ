@@ -82,7 +82,8 @@ std::string readFile(std::string_view path);
     std::string_view result_to_string(RESULT_MEAN mean);
 
     // 存结果 POD
-    struct result { int cpu_time;
+    struct result {
+        int cpu_time;
         int real_time;
         long memory;
         int signal;
